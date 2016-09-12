@@ -1,4 +1,4 @@
-var testing = false;
+
 
 function graph(c) {
     
@@ -21,7 +21,7 @@ function graph(c) {
     this.context.putImageData(this.imgData,0,0);
     
     //create an array to keep track of the changes made to the imgData array.
-    this.changes = new Array();
+    this.changes = [];
     this.changeCount = 0;
     
     //initilize the density of this map as 100.
@@ -56,9 +56,9 @@ function graph(c) {
         }
         
         this.changeCount += this.changes.length;
-        this.changes = new Array();
+        this.changes = [];
         this.context.putImageData(this.imgData, 0, 0);
-    }
+    };
     
     //function used to easily create test data in the form of solid rectangles.
     this.createObject = function(x,y,width,height) {
@@ -71,7 +71,7 @@ function graph(c) {
             }
         }
         this.update();
-    }
+    };
     
     //function used to test if a coordinate is within the acceptable range for the canvas.
     this.testCoord = function(x,y) {
@@ -80,7 +80,7 @@ function graph(c) {
         } else {
             return true;
         }
-    }
+    };
     
     //function used to check an area to see how much of it has been cleared.
     this.checkFogDensity = function(x, y, width, height) {
@@ -94,7 +94,7 @@ function graph(c) {
             }
         }
         return 100*count/(width*height);
-    }
+    };
 }
 
 //Object used to describe the drone's goals.
@@ -115,15 +115,15 @@ function path(start, end, spacing) {
     
     this.insertNode = function(index, point) {
         this.nodes.splice(index,0,point);
-    }
+    };
     
     this.removeNode = function(index) {
         this.nodes.splice(index,1);
-    }
+    };
     
     this.replaceNode = function(index, point) {
         this.nodes.splice(index,1,point);
-    }
+    };
 }
 
 //Object used to make code easier to understand.
@@ -133,11 +133,11 @@ function point(x,y) {
     
     this.distanceFrom = function(point) {
         return Math.sqrt(Math.pow(point.x - this.x,2) + Math.pow(point.y - this.y,2));
-    }
+    };
     
     this.angleBetween = function(point) {
         return Math.atan2(point.y - this.y, point.x - this.x);
-    }
+    };
 }
 
 //Object type used to describe the vectors used.
@@ -152,23 +152,23 @@ function vector(magnitude, angle) {
         this.y = y;
         this.magnitude = Math.sqrt(Math.pow(this.x,2) + Math.pow(this.y,2));
         this.angle = Math.atan2(this.y, this.x);
-    }
+    };
     
     this.add = function(vector2) {
         this.x += vector2.magnitude*Math.cos(vector2.angle);
         this.y += vector2.magnitude*Math.sin(vector2.angle);
         this.magnitude = Math.sqrt(Math.pow(this.x,2) + Math.pow(this.y,2));
         this.angle = Math.atan2(this.y, this.x);
-    }
+    };
     
     this.resize = function(length) {
-        if (this.magnitude != 0) {
+        if (this.magnitude !== 0) {
             this.x = length*this.x/this.magnitude;
             this.y = length*this.y/this.magnitude;
             this.magnitude = Math.sqrt(Math.pow(this.x,2) + Math.pow(this.y,2));
             this.angle = Math.atan2(this.y, this.x);
         }
-    }
+    };
 }
 
 //Object used to store all data relevent to the drone and perform the functions of the drone.
@@ -204,7 +204,7 @@ var drone = function() {
                 
             }
         }
-    }
+    };
     
     //updates the internal binary map that the drone keeps track of. This binary map is then converted into an image for graphical representation
     this.updateBinaryMap = function(map) {
@@ -229,11 +229,7 @@ var drone = function() {
         map.context.fillRect(this.position.x,this.position.y,10,10);
         map.context.fillStyle = "#00FF00"; //draw the goal
         map.context.fillRect(this.goal.x,this.goal.y,10,10);
-        /*map.context.fillStyle = "#FFFF00"; //draw the path
-        for (var i = 0; i < this.path.nodes.length; i++) {
-            map.context.fillRect(this.path.nodes[i].x,this.path.nodes[i].y,10,10);
-        }*/
-    }
+    };
     
     //updates the goal for the drone via one of two algorithms
     this.updateGoal = function(map) {
@@ -265,42 +261,11 @@ var drone = function() {
                     }
                 }
                 
-                //if the map is not changing, then the drone is stuck and must genereate a new waypoint based on where it has not been. (Work in Progress)
-                /*if (map.changeCount < 200) {
-                    
-                    maxFogDensity = 0;
-                    
-                    for (var x = this.sensorRange/2; x < map.canvas.width; x += this.sensorRange) {
-                        for (var y = this.sensorRange/2; y < map.canvas.height; y += this.sensorRange) {
-                            
-                            var fogDensity = map.checkFogDensity(x,y,this.sensorRange,this.sensorRange);
-                            
-                            if (fogDensity > maxFogDensity) {
-                                maxFogDensity = fogDensity;
-                                this.path.end = new point(x,y);
-                            }
-                        }
-                    }
-                    
-                    this.path = new path(this.position, this.path.end, this.sensorRange);
-                    this.goal = this.path.nodes[0];
-                }*/
-                
                 map.changeCount = 0;
             }
         }
-    }
+    };
     
-    /*
-    this.checkPath = function() {
-        for (var y = Math.round(this.position.y - this.width/2); y < Math.round(this.poisition.y + this.width/2); y++) {
-            for (var x = Math.round(this.position.x - this.width/2); x < Math.round(this.position.x + this.width/2); x++) {
-                if(this.binaryMap[x][y] == "o") {
-                    return new point(x,y);
-                }
-            }
-        }
-    }*/
 
     this.updatePosition = function () {
         this.position.x += this.velocity.x * timeInterval;
@@ -311,7 +276,7 @@ var drone = function() {
         } else if (this.rotation.angle > 2*Math.PI) {
             this.rotation.angle -= 2*Math.PI;
         }
-    }
+    };
     
     //update velocity making sure to rotate toward the goal before accelerating toward it.
     this.updateVelocity = function() {
@@ -323,7 +288,7 @@ var drone = function() {
             this.rotation.magnitude = Math.sign(this.angleClamp(this.position.angleBetween(this.goal) - this.rotation.angle)) * Math.PI/90;
             this.velocity.componentSet(0,0);
         }
-    }
+    };
     
     //ensures no angles are outside of 0 to 2pi.
     this.angleClamp = function(angle) {
@@ -334,18 +299,7 @@ var drone = function() {
         } else {
             return angle;
         }
-    }
-    
-    /*
-    this.detectObjects = function(map) {
-        for (var y = this.position.y - (this.width + this.sensorErrorRange); y < this.position.y + (this.width + this.sensorErrorRange); y++) {
-            for (var x = this.position.x - (this.width + this.sensorErrorRange); x < this.position.x + (this.width + this.sensorErrorRange); x++) {
-                if (map.binaryMap[x][y] == "object") {
-                    
-                }
-            }
-        }
-    }*/
+    };
     
     this.navigate = function(map, testMap) {
         this.scan(testMap);
@@ -353,11 +307,10 @@ var drone = function() {
         this.updateGoal(map);
         this.updateVelocity();
         this.updatePosition();
-    }
-}
+    };
+};
 
 var timeInterval = 1;
-var debug = 0;
 
 //create the map objects.
 var map = new graph("map");
